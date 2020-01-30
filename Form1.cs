@@ -82,7 +82,7 @@ namespace tictactoe_ml
         }
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
-            game.placeHumanSign(e.X, e.Y);
+            game.HumanMakeMove(e.X, e.Y);
         }
         private void SendPlayerMessage()
         {

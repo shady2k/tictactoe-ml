@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace tictactoe_ml
 {
@@ -12,15 +9,12 @@ namespace tictactoe_ml
         public enum GameState
         {
             ChooseTurn,
-            HumanTurn,
-            AgentTurn,
-            Agent2Turn,
-            CheckAndTransferToHuman,
-            CheckAndTransferToAgent,
-            CheckAndTransferToAgent2,
-            HumanWin,
-            AgentWin,
-            Agent2Win,
+            PlayerXTurn,
+            PlayerOTurn,
+            CheckAndTransferToPlayerX,
+            CheckAndTransferToPlayerO,
+            PlayerXWin,
+            PlayerOWin,
             Draw,
             GameEnd,
             Unknown
@@ -30,12 +24,15 @@ namespace tictactoe_ml
         Chat chat;
         GameState gameState;
         Random random = new Random();
+        Player playerX;
+        Player playerO;
 
         public Game(int frameWidth, int frameHeight)
         {
             board = new Board(frameWidth, frameHeight);
             chat = new Chat();
             ChangeGameState(GameState.ChooseTurn);
+
         }
         private void ChangeGameState(GameState _gameState)
         {
@@ -44,19 +41,29 @@ namespace tictactoe_ml
 
             switch (gameState)
             {
-                case GameState.AgentTurn:
-                    chat.AddBotMessage("Мой ход.");
-                    MakeAgentMove();
-                    ChangeGameState(GameState.CheckAndTransferToHuman);
+                case GameState.PlayerXTurn:
+                    if(playerX.MakeMove(this))
+                    {
+                        ChangeGameState(GameState.CheckAndTransferToPlayerO);
+                    }
                     break;
-                case GameState.HumanTurn:
-                    chat.AddBotMessage("Ваша очередь.");
+                case GameState.PlayerOTurn:
+                    if (playerO.MakeMove(this))
+                    {
+                        ChangeGameState(GameState.CheckAndTransferToPlayerX);
+                    }
                     break;
-                case GameState.CheckAndTransferToHuman:
-                    CheckEnd(GameState.HumanTurn);
+                case GameState.CheckAndTransferToPlayerO:
+                    if (!CheckEnd())
+                    {
+                        ChangeGameState(GameState.PlayerOTurn);
+                    }
                     break;
-                case GameState.CheckAndTransferToAgent:
-                    CheckEnd(GameState.AgentTurn);
+                case GameState.CheckAndTransferToPlayerX:
+                    if (!CheckEnd())
+                    {
+                        ChangeGameState(GameState.PlayerXTurn);
+                    }
                     break;
                 case GameState.ChooseTurn:
                     chat.AddBotMessage("Будешь ходить крестиками или ноликами? А еще я могу поиграть сам с собой.");
@@ -67,96 +74,103 @@ namespace tictactoe_ml
                     break;
             }
         }
-        private void CheckEnd(GameState _gameState)
+        private bool CheckEnd()
         {
             var res = board.CheckEnd();
             if (res == Utils.GameEnd.None)
             {
-                ChangeGameState(_gameState);
+                return false;
             }
             else
             {
-                if (res == Utils.GameEnd.Player1Win)
+                if (playerX.GetType().Name == "AgentPlayer" && playerO.GetType().Name == "AgentPlayer")
                 {
-                    chat.AddBotMessage("Поздравляю! Вы выиграли!");
-                } else if(res == Utils.GameEnd.Draw)
-                {
-                    chat.AddBotMessage("Отлично сыграли, у нас ничья.");
-                } else if (res == Utils.GameEnd.Player2Win)
-                {
-                    chat.AddBotMessage("Ну ничего, в следующий раз вам повезет.");
-                } else
-                {
-                    chat.AddBotMessage("Произошла какая-то ошибка :(");
+                    if (res == Utils.GameEnd.Draw)
+                    {
+                        chat.AddBotMessage("У меня ничья.");
+                    }
+                    else if (res == Utils.GameEnd.PlayerXWin)
+                    {
+                        chat.AddBotMessage("Отлично поиграл, крестики выиграли.");
+                    }
+                    else if (res == Utils.GameEnd.PlayerOWin)
+                    {
+                        chat.AddBotMessage("Отлично поиграл, нолики выиграли.");
+                    }
+                    else
+                    {
+                        chat.AddBotMessage("Произошла какая-то ошибка :(");
+                    }
                 }
+                else
+                {
+                    if ((res == Utils.GameEnd.PlayerXWin && playerX.GetType().Name == "HumanPlayer") ||
+                        (res == Utils.GameEnd.PlayerOWin && playerO.GetType().Name == "HumanPlayer"))
+                    {
+                        chat.AddBotMessage("Поздравляю! Вы выиграли!");
+                    }
+                    else if ((res == Utils.GameEnd.PlayerXWin && playerX.GetType().Name == "AgentPlayer") ||
+                        (res == Utils.GameEnd.PlayerOWin && playerO.GetType().Name == "AgentPlayer"))
+                    {
+                        chat.AddBotMessage("Ну ничего, в следующий раз вам повезет.");
+                    }
+                    else if (res == Utils.GameEnd.Draw)
+                    {
+                        chat.AddBotMessage("Отлично сыграли, у нас ничья.");
+                    }
+                    else
+                    {
+                        chat.AddBotMessage("Произошла какая-то ошибка :(");
+                    }
+                }
+
                 ChangeGameState(GameState.GameEnd);
+                return true;
             }
         }
-        private void MakeAgentMove()
-        {
-            List<int> res = GetPossibleMoves();
-            if (res.Count > 0)
-            {
-                int cell = random.Next(0, res.Count() - 1);
-                if (placeAgentSign(res[cell]))
-                {
-                    chat.AddBotMessage("Делаю ход в ячейку " + (res[cell] + 1).ToString());
-                } else
-                {
-                    chat.AddBotMessage("Я пытаюсь выполнить недопустимый ход в ячейку " + (res[cell] + 1).ToString());
-                    chat.AddBotMessage("Что-то пошло не так...");
-                    ChangeGameState(GameState.GameEnd);
-                }
-            } else
-            {
-                ChangeGameState(GameState.CheckAndTransferToHuman);
-            }
-        }
-        private List<int> GetPossibleMoves()
+        public List<int> GetPossibleMoves()
         {
             return board.GetFreeCells();
         }
         public void HumanChoose(string sign)
         {
             board.GenerateBoard();
-            if (sign == "X" && sign == "S")
+            if (sign == "X")
             {
-                board.Player1Sign = "X";
-                board.Player2Sign = "O";
-                ChangeGameState(GameState.HumanTurn);
-            } else if (sign == "O")
-            {
-                board.Player1Sign = "O";
-                board.Player2Sign = "X";
-                ChangeGameState(GameState.AgentTurn);
+                playerO = new AgentPlayer(Utils.PlayerSide.O);
+                playerX = new HumanPlayer(Utils.PlayerSide.X);
             }
-        }
-        public bool placeHumanSign(int x, int y)
-        {
-            if (gameState == GameState.HumanTurn)
+            else if (sign == "O")
             {
-                int cell = board.GetCellFromXY(x, y);
-                if (board.CheckMove(cell))
+                playerO = new HumanPlayer(Utils.PlayerSide.O);
+                playerX = new AgentPlayer(Utils.PlayerSide.X);
+            }
+            else if (sign == "S")
+            {
+                playerO = new AgentPlayer(Utils.PlayerSide.O);
+                playerX = new AgentPlayer(Utils.PlayerSide.X);
+            }
+            else
+            {
+                ChangeGameState(GameState.Unknown);
+                return;
+            }
+            ChangeGameState(GameState.PlayerXTurn);
+        }
+        public bool HumanMakeMove(int x, int y)
+        {
+            if (gameState == GameState.PlayerXTurn && playerX.GetType().Name == "HumanPlayer")
+            {
+                if (playerX.MakeMove(x, y, this))
                 {
-                    board.PlaceSign(cell, board.Player1Sign);
-                    chat.AddPlayerMessage("Я делаю ход в ячейку " + (cell + 1).ToString());
-                    ChangeGameState(GameState.CheckAndTransferToAgent);
-                    return true;
+                    ChangeGameState(GameState.CheckAndTransferToPlayerO);
                 }
             }
-            return false;
-        }
-        private bool placeAgentSign(int cell)
-        {
-            if (gameState == GameState.AgentTurn)
+            if (gameState == GameState.PlayerOTurn && playerO.GetType().Name == "HumanPlayer")
             {
-                if (board.CheckMove(cell))
+                if (playerO.MakeMove(x, y, this))
                 {
-                    board.PlaceSign(cell, board.Player2Sign);
-                    return true;
-                } else
-                {
-                    return false;
+                    ChangeGameState(GameState.CheckAndTransferToPlayerX);
                 }
             }
             return false;
@@ -166,7 +180,8 @@ namespace tictactoe_ml
             if (gameState == GameState.ChooseTurn)
             {
                 return chat.SendPlayerMessage(text);
-            } else
+            }
+            else
             {
                 return Utils.GameAction.Unknown;
             }
@@ -190,6 +205,44 @@ namespace tictactoe_ml
         public bool IsNeedChatSync()
         {
             return chat.NeedSync;
+        }
+        public int GetBoardCellFromXY(int x, int y)
+        {
+            return board.GetCellFromXY(x, y);
+        }
+        public bool CheckMove(int cell)
+        {
+            return board.CheckMove(cell);
+        }
+        public void AddPlayerMessage(string text)
+        {
+            chat.AddPlayerMessage(text);
+        }
+        public void AddBotMessage(string text)
+        {
+            chat.AddBotMessage(text);
+        }
+        public void PlaceSign(int cell, string sign)
+        {
+            if (board.CheckMove(cell))
+            {
+                board.PlaceSign(cell, sign);
+            } else
+            {
+                if ((gameState == GameState.PlayerXTurn || gameState == GameState.PlayerOTurn))
+                {
+                    if (playerX.GetType().Name == "HumanPlayer")
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        chat.AddBotMessage("Выполяется недопустимый ход в ячейку " + (cell + 1).ToString());
+                        chat.AddBotMessage("Что-то пошло не так...");
+                        ChangeGameState(GameState.GameEnd);
+                    }
+                }
+            }
         }
     }
 }

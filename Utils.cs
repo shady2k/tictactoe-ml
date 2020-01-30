@@ -18,10 +18,15 @@ namespace tictactoe_ml
         public enum GameEnd
         {
             None,
-            Player1Win,
-            Player2Win,
+            PlayerXWin,
+            PlayerOWin,
             Draw,
             Unknown
+        }
+        public enum PlayerSide
+        {
+            X,
+            O
         }
     }
 }

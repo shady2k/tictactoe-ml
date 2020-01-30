@@ -45,7 +45,7 @@ namespace tictactoe_ml
             bool isUnderstand = false;
             var matchX = Regex.Match(text, @"крест|^x$|^х$", RegexOptions.IgnoreCase);
             var matchO = Regex.Match(text, @"нолик|^o$|^о$", RegexOptions.IgnoreCase);
-            var matchS = Regex.Match(text, @"комп|сам", RegexOptions.IgnoreCase);
+            var matchS = Regex.Match(text, @"комп|сам|^s$", RegexOptions.IgnoreCase);
 
             if (matchX.Success)
             {
@@ -57,7 +57,7 @@ namespace tictactoe_ml
                 isUnderstand = true;
                 AddBotMessage("Отлично! Тогда я будут играть крестиками.");
                 return Utils.GameAction.HumanChooseO;
-            } else if (matchO.Success)
+            } else if (matchS.Success)
             {
                 isUnderstand = true;
                 AddBotMessage("Ок, играю сам с собой.");

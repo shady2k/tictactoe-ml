@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace tictactoe_ml
 {
-    class Board
+    public class Board
     {
         int xStep;
         int yStep;
@@ -93,91 +93,91 @@ namespace tictactoe_ml
 
             if (board[0] != null && board[0] == board[1] && board[1] == board[2])
             {
-                if(board[0] == HumanSign)
+                if(board[0] == "X")
                 {
-                    return Utils.GameEnd.HumanWin;
+                    return Utils.GameEnd.PlayerXWin;
                 } else
                 {
-                    return Utils.GameEnd.AgentWin;
+                    return Utils.GameEnd.PlayerOWin;
                 }
             }
             if (board[3] != null && board[3] == board[4] && board[4] == board[5])
             {
-                if (board[3] == HumanSign)
+                if (board[3] == "X")
                 {
-                    return Utils.GameEnd.HumanWin;
+                    return Utils.GameEnd.PlayerXWin;
                 }
                 else
                 {
-                    return Utils.GameEnd.AgentWin;
+                    return Utils.GameEnd.PlayerOWin;
                 }
             }
             if (board[6] != null && board[6] == board[7] && board[7] == board[8])
             {
-                if (board[6] == HumanSign)
+                if (board[6] == "X")
                 {
-                    return Utils.GameEnd.HumanWin;
+                    return Utils.GameEnd.PlayerXWin;
                 }
                 else
                 {
-                    return Utils.GameEnd.AgentWin;
+                    return Utils.GameEnd.PlayerOWin;
                 }
             }
 
             if (board[0] != null && board[0] == board[3] && board[3] == board[6])
             {
-                if (board[0] == HumanSign)
+                if (board[0] == "X")
                 {
-                    return Utils.GameEnd.HumanWin;
+                    return Utils.GameEnd.PlayerXWin;
                 }
                 else
                 {
-                    return Utils.GameEnd.AgentWin;
+                    return Utils.GameEnd.PlayerOWin;
                 }
             }
             if (board[1] != null && board[1] == board[4] && board[4] == board[7])
             {
-                if (board[1] == HumanSign)
+                if (board[1] == "X")
                 {
-                    return Utils.GameEnd.HumanWin;
+                    return Utils.GameEnd.PlayerXWin;
                 }
                 else
                 {
-                    return Utils.GameEnd.AgentWin;
+                    return Utils.GameEnd.PlayerOWin;
                 }
             }
             if (board[2] != null && board[2] == board[5] && board[5] == board[8])
             {
-                if (board[2] == HumanSign)
+                if (board[2] == "X")
                 {
-                    return Utils.GameEnd.HumanWin;
+                    return Utils.GameEnd.PlayerXWin;
                 }
                 else
                 {
-                    return Utils.GameEnd.AgentWin;
+                    return Utils.GameEnd.PlayerOWin;
                 }
             }
 
             if (board[0] != null && board[0] == board[4] && board[4]==board[8])
             {
-                if (board[4] == HumanSign)
+                if (board[4] == "X")
                 {
-                    return Utils.GameEnd.HumanWin;
+                    return Utils.GameEnd.PlayerXWin;
                 }
                 else
                 {
-                    return Utils.GameEnd.AgentWin;
+                    return Utils.GameEnd.PlayerOWin;
                 }
             }
             if (board[2] != null && board[2] == board[4] && board[4] == board[6])
             {
-                if (board[4] == HumanSign)
+                if (board[4] == "X")
                 {
-                    return Utils.GameEnd.HumanWin;
+                    return Utils.GameEnd.PlayerXWin;
                 }
                 else
                 {
-                    return Utils.GameEnd.AgentWin;
+                    return Utils.GameEnd.PlayerOWin;
                 }
             }
 

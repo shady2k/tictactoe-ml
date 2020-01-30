@@ -6,23 +6,45 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 
 namespace tictactoe_ml
 {
     public partial class Form1 : Form
     {
-        Board board;
-        Chat chat;
+        private Game game;
+        private System.Timers.Timer mainTimer;
         public Form1()
         {
             InitializeComponent();
+            game = new Game(pictureBox1.Width, pictureBox1.Height);
+
             tbChat.Text = "Введите сообщение";
             tbChat.GotFocus += new EventHandler(HidePlaceholder);
             tbChat.LostFocus += new EventHandler(ShowPlaceholder);
             GenerateBoard();
-            chat = new Chat();
             UpdateChatUI();
+            this.ActiveControl = tbChat;
+        }
+        private void SetTimer()
+        {
+            mainTimer = new System.Timers.Timer(250);
+            mainTimer.Elapsed += OnTimedEvent;
+            mainTimer.AutoReset = true;
+            mainTimer.Enabled = true;
+        }
+        private void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            try
+            {
+                this.Invoke((MethodInvoker)(() =>
+                {
+                    UpdateChatUI();
+                    UpdateBoardUI();
+                }
+                ));
+            } catch { }
         }
         public void HidePlaceholder(object sender, EventArgs e)
         {
@@ -33,7 +55,18 @@ namespace tictactoe_ml
         }
         private void UpdateChatUI()
         {
-            tbLog.Text = String.Join(Environment.NewLine, chat.GetChatLog());
+            if (game.IsNeedChatSync()) {
+                tbLog.Text = String.Join(Environment.NewLine, game.GetChatLog());
+                tbLog.SelectionStart = tbLog.Text.Length;
+                tbLog.ScrollToCaret();
+            }
+        }
+        private void UpdateBoardUI()
+        {
+            if(game.IsNeedBoardSync())
+            {
+                pictureBox1.Image = game.GetBoardImage();
+            }
         }
         public void ShowPlaceholder(object sender, EventArgs e)
         {
@@ -41,30 +74,35 @@ namespace tictactoe_ml
             {
                 tbChat.Text = "Введите сообщение";
             }
+            tbChat.Focus();
         }
         private void GenerateBoard()
         {
-            board = new Board(pictureBox1.Width, pictureBox1.Height);
-            pictureBox1.Image = board.GetBoardImage();
+            pictureBox1.Image = game.GetBoardImage();
         }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            
-        }
-
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
-            board.PlaceO(e.X, e.Y);
-            pictureBox1.Image = board.GetBoardImage();
+            game.placeHumanSign(e.X, e.Y);
         }
         private void SendPlayerMessage()
         {
             if (!string.IsNullOrWhiteSpace(tbChat.Text) && tbChat.Text != "Введите сообщение")
             {
-                chat.SendPlayerMessage(tbChat.Text);
+                switch (game.SendPlayerMessage(tbChat.Text)) {
+                    case Utils.GameAction.HumanChooseX: game.HumanChoose("X");
+                        break;
+                    case Utils.GameAction.HumanChooseO:
+                        game.HumanChoose("O");
+                        break;
+                    case Utils.GameAction.HumanChooseS:
+                        game.HumanChoose("S");
+                        break;
+                    case Utils.GameAction.Unknown:
+                        game.AddUnknownMessage();
+                        break;
+                }
+
                 tbChat.Text = "";
-                UpdateChatUI();
             }
         }
         private void button2_Click(object sender, EventArgs e)
@@ -78,6 +116,11 @@ namespace tictactoe_ml
             {
                 SendPlayerMessage();
             }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            SetTimer();
         }
     }
 }

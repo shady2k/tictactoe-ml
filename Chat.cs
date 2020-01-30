@@ -10,43 +10,75 @@ namespace tictactoe_ml
     class Chat
     {
         private List<string> chatLog = new List<string>();
+        public bool NeedSync = false;
+        Random random = new Random();
+        string[] unknownCommand = { "Я вас не понял, повторите еще раз.",
+                                    "Хм, здесь что-то на эльфийском, объясните мне другими словами.",
+                                    "Не могу понять, что от меня нужно."
+        };
         public Chat()
         {
-            AddBotMessage("Привет, сыграем? Будешь ходить крестиками или ноликами?");
+            AddBotMessage("Привет, сыграем?");
         }
-        private void AddBotMessage(string text)
+        public void AddBotMessage(string text)
         {
             chatLog.Add("Бот: " + text);
+            NeedSync = true;
         }
-        public void SendPlayerMessage(string text)
+        public void AddPlayerMessage(string text)
         {
             chatLog.Add("Игрок: " + text);
-            AnalyzePlayerMessage(text);
+            NeedSync = true;
         }
-        private void AnalyzePlayerMessage(string text)
+        public void AddDebugMessage(string text)
+        {
+            chatLog.Add("DEBUG: " + text);
+            NeedSync = true;
+        }
+        public Utils.GameAction SendPlayerMessage(string text)
+        {
+            AddPlayerMessage(text);
+            return AnalyzePlayerMessage(text);
+        }
+        private Utils.GameAction AnalyzePlayerMessage(string text)
         {
             bool isUnderstand = false;
             var matchX = Regex.Match(text, @"крест|^x$|^х$", RegexOptions.IgnoreCase);
-            if(matchX.Success)
+            var matchO = Regex.Match(text, @"нолик|^o$|^о$", RegexOptions.IgnoreCase);
+            var matchS = Regex.Match(text, @"комп|сам", RegexOptions.IgnoreCase);
+
+            if (matchX.Success)
             {
                 isUnderstand = true;
                 AddBotMessage("Отлично! Тогда я будут играть ноликами.");
-                AddBotMessage("Ваш ход.");
-            }
-            var matchO = Regex.Match(text, @"нолик|^o$|^о$", RegexOptions.IgnoreCase);
-            if (matchO.Success)
+                return Utils.GameAction.HumanChooseX;
+            } else if (matchO.Success)
             {
                 isUnderstand = true;
                 AddBotMessage("Отлично! Тогда я будут играть крестиками.");
-                AddBotMessage("Мой ход.");
-            }
-            if(!isUnderstand)
+                return Utils.GameAction.HumanChooseO;
+            } else if (matchO.Success)
             {
-                AddBotMessage("Я вас не понял, повторите еще раз.");
+                isUnderstand = true;
+                AddBotMessage("Ок, играю сам с собой.");
+                return Utils.GameAction.HumanChooseS;
             }
+
+            if (!isUnderstand)
+            {
+                SendUnknownAnswer();
+                return Utils.GameAction.Unknown;
+            }
+
+            return Utils.GameAction.Unknown;
+        }
+        public void SendUnknownAnswer()
+        {
+            AddBotMessage(unknownCommand[random.Next(0, unknownCommand.Length)]);
         }
         public List<string> GetChatLog()
         {
+            NeedSync = false;
             return chatLog;
         }
     }

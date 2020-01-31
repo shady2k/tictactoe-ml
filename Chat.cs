@@ -44,10 +44,19 @@ namespace tictactoe_ml
         {
             bool isUnderstand = false;
             var matchX = Regex.Match(text, @"крест|^x$|^х$", RegexOptions.IgnoreCase);
-            var matchO = Regex.Match(text, @"нолик|^o$|^о$", RegexOptions.IgnoreCase);
+            var matchO = Regex.Match(text, @"нолик|^o$|^о$|^0$", RegexOptions.IgnoreCase);
             var matchS = Regex.Match(text, @"комп|сам|^s$", RegexOptions.IgnoreCase);
+            var matchHelp = Regex.Match(text, @"помощ|помог|help|^\?$", RegexOptions.IgnoreCase);
 
-            if (matchX.Success)
+            if(matchHelp.Success)
+            {
+                isUnderstand = true;
+                AddBotMessage("крестиком, x, ноликом, o, 0 - выбор крестика");
+                AddBotMessage("ноликом, o, 0 - выбор нолика");
+                AddBotMessage("компьютер, сам, s - буду играть сам с собой");
+                AddBotMessage("помощь, help - отображение этой информации");
+                return Utils.GameAction.None;
+            } else if (matchX.Success)
             {
                 isUnderstand = true;
                 AddBotMessage("Отлично! Тогда я будут играть ноликами.");
@@ -66,7 +75,6 @@ namespace tictactoe_ml
 
             if (!isUnderstand)
             {
-                SendUnknownAnswer();
                 return Utils.GameAction.Unknown;
             }
 
@@ -74,7 +82,7 @@ namespace tictactoe_ml
         }
         public void SendUnknownAnswer()
         {
-            AddBotMessage(unknownCommand[random.Next(0, unknownCommand.Length)]);
+            AddBotMessage(unknownCommand[random.Next(0, unknownCommand.Length)] + ". Если вам нужна помощь, наберите help или ?");
         }
         public List<string> GetChatLog()
         {

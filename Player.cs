@@ -23,10 +23,11 @@ namespace tictactoe_ml
             if (side == Utils.PlayerSide.X) return "X";
             return null;
         }
-        public string GetSign()
+        public bool isHuman()
         {
-            return "X";
+            return this.GetType().Name == "HumanPlayer";
         }
+
         public abstract bool MakeMove(Game game);
         public abstract bool MakeMove(int x, int y, Game game);
     }

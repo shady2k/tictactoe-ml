@@ -13,6 +13,7 @@ namespace tictactoe_ml
             HumanChooseX,
             HumanChooseO,
             HumanChooseS,
+            None,
             Unknown
         }
         public enum GameEnd

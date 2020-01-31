@@ -23,7 +23,6 @@ namespace tictactoe_ml
         Board board;
         Chat chat;
         GameState gameState;
-        Random random = new Random();
         Player playerX;
         Player playerO;
 
@@ -70,6 +69,7 @@ namespace tictactoe_ml
                     break;
                 case GameState.GameEnd:
                     chat.AddBotMessage("Игра окончена! Еще разок?");
+                    chat.AddBotMessage("------------------------------------------------------------");
                     ChangeGameState(GameState.ChooseTurn);
                     break;
             }
@@ -83,7 +83,7 @@ namespace tictactoe_ml
             }
             else
             {
-                if (playerX.GetType().Name == "AgentPlayer" && playerO.GetType().Name == "AgentPlayer")
+                if (!playerX.isHuman() && !playerO.isHuman())
                 {
                     if (res == Utils.GameEnd.Draw)
                     {
@@ -104,13 +104,13 @@ namespace tictactoe_ml
                 }
                 else
                 {
-                    if ((res == Utils.GameEnd.PlayerXWin && playerX.GetType().Name == "HumanPlayer") ||
-                        (res == Utils.GameEnd.PlayerOWin && playerO.GetType().Name == "HumanPlayer"))
+                    if ((res == Utils.GameEnd.PlayerXWin && playerX.isHuman()) ||
+                        (res == Utils.GameEnd.PlayerOWin && playerO.isHuman()))
                     {
                         chat.AddBotMessage("Поздравляю! Вы выиграли!");
                     }
-                    else if ((res == Utils.GameEnd.PlayerXWin && playerX.GetType().Name == "AgentPlayer") ||
-                        (res == Utils.GameEnd.PlayerOWin && playerO.GetType().Name == "AgentPlayer"))
+                    else if ((res == Utils.GameEnd.PlayerXWin && !playerX.isHuman()) ||
+                        (res == Utils.GameEnd.PlayerOWin && !playerO.isHuman()))
                     {
                         chat.AddBotMessage("Ну ничего, в следующий раз вам повезет.");
                     }
@@ -159,14 +159,14 @@ namespace tictactoe_ml
         }
         public bool HumanMakeMove(int x, int y)
         {
-            if (gameState == GameState.PlayerXTurn && playerX.GetType().Name == "HumanPlayer")
+            if (gameState == GameState.PlayerXTurn && playerX.isHuman())
             {
                 if (playerX.MakeMove(x, y, this))
                 {
                     ChangeGameState(GameState.CheckAndTransferToPlayerO);
                 }
             }
-            if (gameState == GameState.PlayerOTurn && playerO.GetType().Name == "HumanPlayer")
+            if (gameState == GameState.PlayerOTurn && playerO.isHuman())
             {
                 if (playerO.MakeMove(x, y, this))
                 {
@@ -186,7 +186,7 @@ namespace tictactoe_ml
                 return Utils.GameAction.Unknown;
             }
         }
-        public void AddUnknownMessage()
+        public void SendUnknownAnswer()
         {
             chat.SendUnknownAnswer();
         }
@@ -231,7 +231,7 @@ namespace tictactoe_ml
             {
                 if ((gameState == GameState.PlayerXTurn || gameState == GameState.PlayerOTurn))
                 {
-                    if (playerX.GetType().Name == "HumanPlayer")
+                    if (playerX.isHuman())
                     {
                         return;
                     }

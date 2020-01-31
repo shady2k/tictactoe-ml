@@ -98,7 +98,7 @@ namespace tictactoe_ml
                         game.HumanChoose("S");
                         break;
                     case Utils.GameAction.Unknown:
-                        game.AddUnknownMessage();
+                        game.SendUnknownAnswer();
                         break;
                 }
 

@@ -13,7 +13,7 @@ namespace tictactoe_ml
         {
             this.side = side;
         }
-        public Utils.PlayerSide GetSide()
+        public Utils.PlayerSide GetPlayerSide()
         {
             return side;
         }
@@ -27,8 +27,11 @@ namespace tictactoe_ml
         {
             return this.GetType().Name == "HumanPlayer";
         }
-
+        
         public abstract bool MakeMove(Game game);
         public abstract bool MakeMove(int x, int y, Game game);
+        public abstract void Win();
+        public abstract void Loose();
+        public abstract void Draw();
     }
 }

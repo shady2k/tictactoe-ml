@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace tictactoe_ml
+﻿namespace tictactoe_ml
 {
     class HumanPlayer : Player
     {
@@ -26,6 +20,18 @@ namespace tictactoe_ml
                 return true;
             }
             return false;
+        }
+        public override void Win()
+        {
+            return;
+        }
+        public override void Loose()
+        {
+            return;
+        }
+        public override void Draw()
+        {
+            return;
         }
     }
 }

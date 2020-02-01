@@ -74,6 +74,24 @@ namespace tictactoe_ml
                     break;
             }
         }
+        private void NotifyPlayersAboutGameResult(Utils.GameEnd res)
+        {
+            switch(res)
+            {
+                case Utils.GameEnd.PlayerOWin:
+                    playerO.Win();
+                    playerX.Loose();
+                    break;
+                case Utils.GameEnd.PlayerXWin:
+                    playerX.Win();
+                    playerO.Loose();
+                    break;
+                case Utils.GameEnd.Draw:
+                    playerX.Draw();
+                    playerO.Draw();
+                    break;
+            }
+        }
         private bool CheckEnd()
         {
             var res = board.CheckEnd();
@@ -83,6 +101,8 @@ namespace tictactoe_ml
             }
             else
             {
+                NotifyPlayersAboutGameResult(res);
+
                 if (!playerX.isHuman() && !playerO.isHuman())
                 {
                     if (res == Utils.GameEnd.Draw)
@@ -221,6 +241,10 @@ namespace tictactoe_ml
         public void AddBotMessage(string text)
         {
             chat.AddBotMessage(text);
+        }
+        public string[] GetBoard()
+        {
+            return board.GetBoard();
         }
         public void PlaceSign(int cell, string sign)
         {

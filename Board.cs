@@ -18,9 +18,6 @@ namespace tictactoe_ml
         int frameWidthSize;
         int frameHeightSize;
 
-        public string Player1Sign;
-        public string Player2Sign;
-
         public bool NeedSync = false;
         Bitmap img;
         string[] board = new string[9];
@@ -31,6 +28,10 @@ namespace tictactoe_ml
             this.frameHeightSize = frameHeightSize;
 
             GenerateBoard();
+        }
+        public string[] GetBoard()
+        {
+            return board.ToArray();
         }
         public void GenerateBoard()
         {

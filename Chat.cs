@@ -35,50 +35,61 @@ namespace tictactoe_ml
             chatLog.Add("DEBUG: " + text);
             NeedSync = true;
         }
-        public Utils.GameAction SendPlayerMessage(string text)
+        public ChatResponse SendPlayerMessage(string text)
         {
             AddPlayerMessage(text);
             return AnalyzePlayerMessage(text);
         }
-        private Utils.GameAction AnalyzePlayerMessage(string text)
+        private ChatResponse AnalyzePlayerMessage(string text)
         {
             bool isUnderstand = false;
             var matchX = Regex.Match(text, @"крест|^x$|^х$", RegexOptions.IgnoreCase);
             var matchO = Regex.Match(text, @"нолик|^o$|^о$|^0$", RegexOptions.IgnoreCase);
-            var matchS = Regex.Match(text, @"комп|сам|^s$", RegexOptions.IgnoreCase);
+            var matchS = Regex.Match(text, @"комп|сам|^s", RegexOptions.IgnoreCase);
             var matchHelp = Regex.Match(text, @"помощ|помог|help|^\?$", RegexOptions.IgnoreCase);
+            var matchInt = Regex.Match(text, @"\d+", RegexOptions.IgnoreCase);
 
-            if(matchHelp.Success)
+            if (matchHelp.Success)
             {
                 isUnderstand = true;
                 AddBotMessage("крестиком, x, ноликом, o, 0 - выбор крестика");
                 AddBotMessage("ноликом, o, 0 - выбор нолика");
                 AddBotMessage("компьютер, сам, s - буду играть сам с собой");
                 AddBotMessage("помощь, help - отображение этой информации");
-                return Utils.GameAction.None;
+                return new ChatResponse(Utils.GameAction.HumanChooseO);
             } else if (matchX.Success)
             {
                 isUnderstand = true;
                 AddBotMessage("Отлично! Тогда я будут играть ноликами.");
-                return Utils.GameAction.HumanChooseX;
+                return new ChatResponse(Utils.GameAction.HumanChooseX);
             } else if (matchO.Success)
             {
                 isUnderstand = true;
                 AddBotMessage("Отлично! Тогда я будут играть крестиками.");
-                return Utils.GameAction.HumanChooseO;
+                return new ChatResponse(Utils.GameAction.HumanChooseO);
             } else if (matchS.Success)
             {
-                isUnderstand = true;
-                AddBotMessage("Ок, играю сам с собой.");
-                return Utils.GameAction.HumanChooseS;
+                int val = 1;
+                if(matchInt.Success)
+                {
+                    val = Int32.Parse(matchInt.Value);
+                    isUnderstand = true;
+                    AddBotMessage("Ок, играю сам с собой " + val.ToString() + " раз.");
+                    return new ChatResponse(Utils.GameAction.HumanChooseSM, val.ToString());
+                } else
+                {
+                    isUnderstand = true;
+                    AddBotMessage("Ок, играю сам с собой.");
+                    return new ChatResponse(Utils.GameAction.HumanChooseS);
+                }
             }
 
             if (!isUnderstand)
             {
-                return Utils.GameAction.Unknown;
+                return new ChatResponse(Utils.GameAction.Unknown);
             }
 
-            return Utils.GameAction.Unknown;
+            return new ChatResponse(Utils.GameAction.Unknown);
         }
         public void SendUnknownAnswer()
         {

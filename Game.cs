@@ -25,6 +25,7 @@ namespace tictactoe_ml
         GameState gameState;
         Player playerX;
         Player playerO;
+        int iterations = 0;
 
         public Game(int frameWidth, int frameHeight)
         {
@@ -32,6 +33,10 @@ namespace tictactoe_ml
             chat = new Chat();
             ChangeGameState(GameState.ChooseTurn);
 
+        }
+        public void SetIterations(int i)
+        {
+            iterations = i;
         }
         private void ChangeGameState(GameState _gameState)
         {
@@ -65,7 +70,18 @@ namespace tictactoe_ml
                     }
                     break;
                 case GameState.ChooseTurn:
-                    chat.AddBotMessage("Будешь ходить крестиками или ноликами? А еще я могу поиграть сам с собой.");
+                    if (iterations > 0)
+                    {
+                        chat.AddBotMessage("------------------------------------------------------------");
+                        chat.AddBotMessage("Итерация " + iterations.ToString());
+                        chat.AddBotMessage("------------------------------------------------------------");
+                        iterations--;
+                        HumanChoose("S");
+                    }
+                    else
+                    {
+                        chat.AddBotMessage("Будешь ходить крестиками или ноликами? А еще я могу поиграть сам с собой.");
+                    }
                     break;
                 case GameState.GameEnd:
                     chat.AddBotMessage("Игра окончена! Еще разок?");
@@ -165,7 +181,7 @@ namespace tictactoe_ml
                 playerO = new HumanPlayer(Utils.PlayerSide.O);
                 playerX = new AgentPlayer(Utils.PlayerSide.X);
             }
-            else if (sign == "S")
+            else if (sign == "S" || sign == "SM")
             {
                 playerO = new AgentPlayer(Utils.PlayerSide.O);
                 playerX = new AgentPlayer(Utils.PlayerSide.X);
@@ -195,7 +211,7 @@ namespace tictactoe_ml
             }
             return false;
         }
-        public Utils.GameAction SendPlayerMessage(string text)
+        public ChatResponse SendPlayerMessage(string text)
         {
             if (gameState == GameState.ChooseTurn)
             {
@@ -203,7 +219,7 @@ namespace tictactoe_ml
             }
             else
             {
-                return Utils.GameAction.Unknown;
+                return new ChatResponse(Utils.GameAction.Unknown);
             }
         }
         public void SendUnknownAnswer()
@@ -241,6 +257,10 @@ namespace tictactoe_ml
         public void AddBotMessage(string text)
         {
             chat.AddBotMessage(text);
+        }
+        public void AddDebugMessage(string text)
+        {
+            chat.AddDebugMessage(text);
         }
         public string[] GetBoard()
         {

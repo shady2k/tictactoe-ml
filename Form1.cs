@@ -88,14 +88,21 @@ namespace tictactoe_ml
         {
             if (!string.IsNullOrWhiteSpace(tbChat.Text) && tbChat.Text != "Введите сообщение")
             {
-                switch (game.SendPlayerMessage(tbChat.Text)) {
-                    case Utils.GameAction.HumanChooseX: game.HumanChoose("X");
+                var resp = game.SendPlayerMessage(tbChat.Text);
+                var ga = resp.gameAction;
+                switch (ga) {
+                    case Utils.GameAction.HumanChooseX: 
+                        game.HumanChoose("X");
                         break;
                     case Utils.GameAction.HumanChooseO:
                         game.HumanChoose("O");
                         break;
                     case Utils.GameAction.HumanChooseS:
                         game.HumanChoose("S");
+                        break;
+                    case Utils.GameAction.HumanChooseSM:
+                        game.SetIterations(Int32.Parse(resp.payload));
+                        game.HumanChoose("SM");
                         break;
                     case Utils.GameAction.Unknown:
                         game.SendUnknownAnswer();

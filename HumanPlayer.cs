@@ -33,5 +33,9 @@
         {
             return;
         }
+        public override void Dispose()
+        {
+            return;
+        }
     }
 }

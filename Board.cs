@@ -85,16 +85,62 @@ namespace tictactoe_ml
                 return false;
             }
         }
-        public Utils.GameEnd CheckEnd()
+        private void DrawWin(int startCell, int endCell)
         {
-            if(GetFreeCells().Count() == 0)
+            Point startCellPoint = GetXYFromCell(startCell);
+            Point endCellPoint = GetXYFromCell(endCell);
+
+            if(startCellPoint.Y != endCellPoint.Y && startCellPoint.X != endCellPoint.X)
             {
-                return Utils.GameEnd.Draw;
+                if (startCellPoint.Y > endCellPoint.Y)
+                {
+                    startCellPoint.X += (xStep / 4);
+                    endCellPoint.X += (xStep / 2) + (xStep / 4);
+                    startCellPoint.Y += (yStep / 2) + (yStep / 4);
+                    endCellPoint.Y += (yStep / 4);
+                } else
+                {
+                    startCellPoint.X += (xStep / 4);
+                    endCellPoint.X += (xStep / 2) + (xStep / 4);
+                    startCellPoint.Y += (yStep / 4);
+                    endCellPoint.Y += (yStep / 2) + (yStep / 4);
+                }
+            }
+            else if (startCellPoint.Y == endCellPoint.Y)
+            {
+                startCellPoint.X += (xStep / 4);
+                endCellPoint.X += (xStep / 2) + (xStep / 4);
+                startCellPoint.Y += (yStep / 2);
+                endCellPoint.Y += (yStep / 2);
+            } 
+            else if (startCellPoint.Y != endCellPoint.Y)
+            {
+                startCellPoint.X += (xStep / 2);
+                endCellPoint.X += (xStep / 2);
+                startCellPoint.Y += (yStep / 4);
+                endCellPoint.Y += (yStep / 2) + (yStep / 4);
             }
 
+
+            try
+            {
+                using (Graphics graph = Graphics.FromImage(img))
+                {
+                    Pen tPen = new Pen(Color.Blue, 3);
+                    graph.DrawLine(tPen, startCellPoint, endCellPoint);
+                }
+            } catch
+            {
+
+            }
+            NeedSync = true;
+        }
+        public Utils.GameEnd CheckEnd()
+        {
             if (board[0] != null && board[0] == board[1] && board[1] == board[2])
             {
-                if(board[0] == "X")
+                DrawWin(0, 2);
+                if (board[0] == "X")
                 {
                     return Utils.GameEnd.PlayerXWin;
                 } else
@@ -104,6 +150,7 @@ namespace tictactoe_ml
             }
             if (board[3] != null && board[3] == board[4] && board[4] == board[5])
             {
+                DrawWin(3, 5);
                 if (board[3] == "X")
                 {
                     return Utils.GameEnd.PlayerXWin;
@@ -115,6 +162,7 @@ namespace tictactoe_ml
             }
             if (board[6] != null && board[6] == board[7] && board[7] == board[8])
             {
+                DrawWin(6, 8);
                 if (board[6] == "X")
                 {
                     return Utils.GameEnd.PlayerXWin;
@@ -127,6 +175,7 @@ namespace tictactoe_ml
 
             if (board[0] != null && board[0] == board[3] && board[3] == board[6])
             {
+                DrawWin(0, 6);
                 if (board[0] == "X")
                 {
                     return Utils.GameEnd.PlayerXWin;
@@ -138,6 +187,7 @@ namespace tictactoe_ml
             }
             if (board[1] != null && board[1] == board[4] && board[4] == board[7])
             {
+                DrawWin(1, 7);
                 if (board[1] == "X")
                 {
                     return Utils.GameEnd.PlayerXWin;
@@ -149,6 +199,7 @@ namespace tictactoe_ml
             }
             if (board[2] != null && board[2] == board[5] && board[5] == board[8])
             {
+                DrawWin(2, 8);
                 if (board[2] == "X")
                 {
                     return Utils.GameEnd.PlayerXWin;
@@ -161,6 +212,7 @@ namespace tictactoe_ml
 
             if (board[0] != null && board[0] == board[4] && board[4]==board[8])
             {
+                DrawWin(0, 8);
                 if (board[4] == "X")
                 {
                     return Utils.GameEnd.PlayerXWin;
@@ -172,6 +224,7 @@ namespace tictactoe_ml
             }
             if (board[2] != null && board[2] == board[4] && board[4] == board[6])
             {
+                DrawWin(6, 2);
                 if (board[4] == "X")
                 {
                     return Utils.GameEnd.PlayerXWin;
@@ -180,6 +233,11 @@ namespace tictactoe_ml
                 {
                     return Utils.GameEnd.PlayerOWin;
                 }
+            }
+
+            if (GetFreeCells().Count() == 0)
+            {
+                return Utils.GameEnd.Draw;
             }
 
             return Utils.GameEnd.None;
@@ -204,9 +262,8 @@ namespace tictactoe_ml
 
             return cell;
         }
-        public void PlaceSign(int cell, string sign)
+        public Point GetXYFromCell(int cell)
         {
-            board[cell] = sign;
             int x = 0;
             int y = 0;
             if (cell >= 0 && cell <= 2)
@@ -224,14 +281,25 @@ namespace tictactoe_ml
                 x = cell - 6;
                 y = 2;
             }
-            DrawSymbol(x * xStep, y * yStep, sign);
+
+            return new Point(x * xStep, y * yStep);
+        }
+        public void PlaceSign(int cell, string sign)
+        {
+            board[cell] = sign;
+            Point xy = GetXYFromCell(cell);
+            DrawSymbol(xy.X, xy.Y, sign);
         }
         private void DrawSymbol(int x, int y, string symbol)
         {
-            using (Graphics graph = Graphics.FromImage(img))
+            try
             {
-                graph.DrawString(symbol, new Font("Arial", 60), Brushes.Black, new Point(x, y));
+                using (Graphics graph = Graphics.FromImage(img))
+                {
+                    graph.DrawString(symbol, new Font("Arial", 60), Brushes.Black, new Point(x, y));
+                }
             }
+            catch { }
             NeedSync = true;
         }
         public Bitmap GetBoardImage()
@@ -241,3 +309,4 @@ namespace tictactoe_ml
         }
     }
 }
+

@@ -37,7 +37,7 @@ namespace tictactoe_ml
         double winValue = 1;
         double looseValue = 0;
         double drawValue = 0.5;
-        double probingProbability = 0.3;
+        double probingProbability = 0.05;
         string modelFile = AppDomain.CurrentDomain.BaseDirectory + "model.json";
         string[] lastBoard;
 
@@ -45,6 +45,11 @@ namespace tictactoe_ml
         {
             LoadStates();
             return;
+        }
+        public AgentPlayer(Utils.PlayerSide side, double ProbingProbability) : base(side)
+        {
+            this.probingProbability = ProbingProbability;
+            LoadStates();
         }
         public override bool MakeMove(Game game)
         {
@@ -189,7 +194,14 @@ namespace tictactoe_ml
             }
 
             string jsonString = Newtonsoft.Json.JsonConvert.SerializeObject(tempStates);
-            System.IO.File.WriteAllText(modelFile, jsonString);
+            try
+            {
+                System.IO.File.WriteAllText(modelFile, jsonString);
+            } catch
+            {
+                System.Threading.Thread.Sleep(500);
+                System.IO.File.WriteAllText(modelFile, jsonString);
+            }
         }
         private void LoadStates()
         {
@@ -218,6 +230,12 @@ namespace tictactoe_ml
                 
                 states = DeepClone(tempStates);
             }
+            
+            /*if (System.IO.File.Exists(modelFile))
+            {
+                string jsonString = System.IO.File.ReadAllText(modelFile);
+                List<State> states = Newtonsoft.Json.JsonConvert.DeserializeObject<List<State>>(jsonString);
+            }*/
         }
         private void CorrectLastStateValue(double value)
         {
@@ -228,11 +246,13 @@ namespace tictactoe_ml
                 {
                     var newValue = Math.Round(lastState.value + alpha * (value - lastState.value), 2);
                     lastState.value = newValue;
-                    if(newValue != 0.5) Console.WriteLine(newValue);
-                    SaveStates();
                 }
             }
             return;
+        }
+        public override void Dispose()
+        {
+            SaveStates();
         }
     }
 }

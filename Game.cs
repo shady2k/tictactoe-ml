@@ -26,6 +26,9 @@ namespace tictactoe_ml
         Player playerX;
         Player playerO;
         int iterations = 0;
+        int humanWin = 0;
+        int agentWin = 0;
+        bool isNeedResultSync = true;
 
         public Game(int frameWidth, int frameHeight)
         {
@@ -33,6 +36,20 @@ namespace tictactoe_ml
             chat = new Chat();
             ChangeGameState(GameState.ChooseTurn);
 
+        }
+        public string GetResult()
+        {
+            return "Счет: " + humanWin.ToString() + " (человек) : " + agentWin.ToString() + " (агент)";
+        }
+        private void setHumanWinResult()
+        {
+            humanWin++;
+            isNeedResultSync = true;
+        }
+        private void setAgentWinResult()
+        {
+            agentWin++;
+            isNeedResultSync = true;
         }
         public void SetIterations(int i)
         {
@@ -75,6 +92,7 @@ namespace tictactoe_ml
                         chat.AddBotMessage("------------------------------------------------------------");
                         chat.AddBotMessage("Итерация " + iterations.ToString());
                         chat.AddBotMessage("------------------------------------------------------------");
+                        Console.WriteLine("Итерация " + iterations.ToString());
                         iterations--;
                         HumanChoose("S");
                     }
@@ -95,10 +113,14 @@ namespace tictactoe_ml
             switch(res)
             {
                 case Utils.GameEnd.PlayerOWin:
+                    if (playerO.isHuman()) setHumanWinResult();
+                    if (!playerO.isHuman()) setAgentWinResult();
                     playerO.Win();
                     playerX.Loose();
                     break;
                 case Utils.GameEnd.PlayerXWin:
+                    if (playerX.isHuman()) setHumanWinResult();
+                    if (!playerX.isHuman()) setAgentWinResult();
                     playerX.Win();
                     playerO.Loose();
                     break;
@@ -170,21 +192,22 @@ namespace tictactoe_ml
         }
         public void HumanChoose(string sign)
         {
+            disposePlayers();
             board.GenerateBoard();
             if (sign == "X")
             {
-                playerO = new AgentPlayer(Utils.PlayerSide.O);
+                playerO = new AgentPlayer(Utils.PlayerSide.O, 0.1);
                 playerX = new HumanPlayer(Utils.PlayerSide.X);
             }
             else if (sign == "O")
             {
                 playerO = new HumanPlayer(Utils.PlayerSide.O);
-                playerX = new AgentPlayer(Utils.PlayerSide.X);
+                playerX = new AgentPlayer(Utils.PlayerSide.X, 0.1);
             }
             else if (sign == "S" || sign == "SM")
             {
-                playerO = new AgentPlayer(Utils.PlayerSide.O);
-                playerX = new AgentPlayer(Utils.PlayerSide.X);
+                playerO = new AgentPlayer(Utils.PlayerSide.O, 0.3);
+                playerX = new AgentPlayer(Utils.PlayerSide.X, 0.8);
             }
             else
             {
@@ -242,6 +265,10 @@ namespace tictactoe_ml
         {
             return chat.NeedSync;
         }
+        public bool IsNeedResultSync()
+        {
+            return isNeedResultSync;
+        }
         public int GetBoardCellFromXY(int x, int y)
         {
             return board.GetCellFromXY(x, y);
@@ -287,6 +314,23 @@ namespace tictactoe_ml
                     }
                 }
             }
+        }
+        private void disposePlayers()
+        {
+            if (playerO != null)
+            {
+                playerO.Dispose();
+                playerO = null;
+            }
+            if (playerX != null)
+            {
+                playerX.Dispose();
+                playerX = null;
+            }
+        }
+        public void ExitGame()
+        {
+            disposePlayers();
         }
     }
 }

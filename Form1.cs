@@ -29,7 +29,7 @@ namespace tictactoe_ml
         }
         private void SetTimer()
         {
-            mainTimer = new System.Timers.Timer(250);
+            mainTimer = new System.Timers.Timer(100);
             mainTimer.Elapsed += OnTimedEvent;
             mainTimer.AutoReset = true;
             mainTimer.Enabled = true;
@@ -42,6 +42,7 @@ namespace tictactoe_ml
                 {
                     UpdateChatUI();
                     UpdateBoardUI();
+                    UpdateResultUI();
                 }
                 ));
             } catch { }
@@ -59,6 +60,13 @@ namespace tictactoe_ml
                 tbLog.Text = String.Join(Environment.NewLine, game.GetChatLog());
                 tbLog.SelectionStart = tbLog.Text.Length;
                 tbLog.ScrollToCaret();
+            }
+        }
+        private void UpdateResultUI()
+        {
+            if (game.IsNeedResultSync())
+            {
+                cbResult.Text = game.GetResult();
             }
         }
         private void UpdateBoardUI()
@@ -128,6 +136,11 @@ namespace tictactoe_ml
         private void Form1_Load(object sender, EventArgs e)
         {
             SetTimer();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            game.ExitGame();
         }
     }
 }

@@ -32,6 +32,7 @@
             this.tbLog = new System.Windows.Forms.TextBox();
             this.tbChat = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
+            this.cbResult = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -73,11 +74,21 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // cbResult
+            // 
+            this.cbResult.AutoSize = true;
+            this.cbResult.Location = new System.Drawing.Point(9, 331);
+            this.cbResult.Name = "cbResult";
+            this.cbResult.Size = new System.Drawing.Size(49, 13);
+            this.cbResult.TabIndex = 5;
+            this.cbResult.Text = "cbResult";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(603, 354);
+            this.Controls.Add(this.cbResult);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.tbChat);
             this.Controls.Add(this.tbLog);
@@ -86,6 +97,7 @@
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Tic-tac-toe-ml";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
@@ -99,6 +111,7 @@
         private System.Windows.Forms.TextBox tbLog;
         private System.Windows.Forms.TextBox tbChat;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label cbResult;
     }
 }
 

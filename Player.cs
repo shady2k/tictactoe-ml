@@ -33,5 +33,6 @@ namespace tictactoe_ml
         public abstract void Win();
         public abstract void Loose();
         public abstract void Draw();
+        public abstract void Dispose();
     }
 }

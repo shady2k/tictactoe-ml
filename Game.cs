@@ -196,13 +196,13 @@ namespace tictactoe_ml
             board.GenerateBoard();
             if (sign == "X")
             {
-                playerO = new AgentPlayer(Utils.PlayerSide.O, 0.1);
+                playerO = new AgentPlayer(Utils.PlayerSide.O, 0.05);
                 playerX = new HumanPlayer(Utils.PlayerSide.X);
             }
             else if (sign == "O")
             {
                 playerO = new HumanPlayer(Utils.PlayerSide.O);
-                playerX = new AgentPlayer(Utils.PlayerSide.X, 0.1);
+                playerX = new AgentPlayer(Utils.PlayerSide.X, 0.05);
             }
             else if (sign == "S" || sign == "SM")
             {

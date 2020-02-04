@@ -52,7 +52,7 @@ namespace tictactoe_ml
             if (matchHelp.Success)
             {
                 isUnderstand = true;
-                AddBotMessage("крестиком, x, ноликом, o, 0 - выбор крестика");
+                AddBotMessage("крестиком, x - выбор крестика");
                 AddBotMessage("ноликом, o, 0 - выбор нолика");
                 AddBotMessage("компьютер, сам, s - буду играть сам с собой");
                 AddBotMessage("помощь, help - отображение этой информации");
